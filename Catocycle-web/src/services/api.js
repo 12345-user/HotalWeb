@@ -62,6 +62,21 @@ export default {
     write('items', list)
     return Promise.resolve(item)
   },
+  async getItem(id){
+    const list = read('items')
+    const found = list.find(i => i.id === id)
+    return Promise.resolve(found)
+  },
+  async updateItem(item){
+    const list = read('items')
+    const idx = list.findIndex(i => i.id === item.id)
+    if(idx !== -1){
+      list.splice(idx, 1, item)
+      write('items', list)
+      return Promise.resolve(item)
+    }
+    return Promise.reject(new Error('not found'))
+  },
   async deleteItem(id){
     const list = read('items')
     const filtered = list.filter(item => item.id !== id)
