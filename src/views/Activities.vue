@@ -1,0 +1,70 @@
+<template>
+  <div>
+    <el-row>
+      <el-col :span="14">
+        <h3>活动记录</h3>
+        <el-timeline>
+          <el-timeline-item v-for="act in activities" :key="act.id" :timestamp="act.time">
+            <h4>{{ act.title }}</h4>
+            <p class="small muted">参与：{{ act.people }}</p>
+            <p>{{ act.desc }}</p>
+            <div v-if="act.photos && act.photos.length">
+              <el-image v-for="(p,i) in act.photos" :key="i" :src="p" style="width:120px;margin-right:8px" fit="cover"/>
+            </div>
+          </el-timeline-item>
+        </el-timeline>
+      </el-col>
+      <el-col :span="10">
+        <h3>添加活动</h3>
+        <el-form label-position="top" :model="form">
+          <el-form-item label="标题">
+            <el-input v-model="form.title" />
+          </el-form-item>
+          <el-form-item label="时间">
+            <el-date-picker v-model="form.time" type="datetime" placeholder="选择时间" style="width:100%" />
+          </el-form-item>
+          <el-form-item label="人员">
+            <el-input v-model="form.people" placeholder="参与人员姓名或人数" />
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input type="textarea" v-model="form.desc" />
+          </el-form-item>
+          <el-form-item label="照片 URL（逗号分隔）">
+            <el-input v-model="form.photos" />
+          </el-form-item>
+          <el-button type="primary" @click="submit">添加</el-button>
+        </el-form>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+import api from '../services/api'
+
+export default {
+  data(){
+    return {
+      activities:[],
+      form:{title:'',time:'',people:'',desc:'',photos:''}
+    }
+  },
+  async created(){
+    this.activities = await api.getActivities()
+  },
+  methods:{
+    async submit(){
+      const payload = {
+        title: this.form.title,
+        time: (this.form.time && new Date(this.form.time).toLocaleString()) || new Date().toLocaleString(),
+        people: this.form.people,
+        desc: this.form.desc,
+        photos: this.form.photos ? this.form.photos.split(',').map(s => s.trim()) : []
+      }
+      await api.addActivity(payload)
+      this.activities = await api.getActivities()
+      this.form = {title:'',time:'',people:'',desc:'',photos:''}
+    }
+  }
+}
+</script>
