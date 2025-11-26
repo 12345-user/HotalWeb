@@ -1,8 +1,8 @@
 :root{
-  --bg: #EFE2D6; /* 淡棕色背景 */
-  --accent: #C79A6B; /* 主色 */
-  --muted: #7A6A5A;
-  --card: #FFFFFF;
+  --bg: #D4B5A0; /* 深棕色背景 - 更暖更深 */
+  --accent: #A0754A; /* 主色 - 更深的棕色 */
+  --muted: #6B5847;
+  --card: #F5EDE3;
 }
 *{box-sizing:border-box}
 html,body,#app{height:100%}

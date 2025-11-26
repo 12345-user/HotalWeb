@@ -26,6 +26,12 @@ export default {
     write('activities', list)
     return Promise.resolve(item)
   },
+  async deleteActivity(id){
+    const list = read('activities')
+    const filtered = list.filter(item => item.id !== id)
+    write('activities', filtered)
+    return Promise.resolve()
+  },
 
   // People
   async getPeople(){
@@ -38,6 +44,12 @@ export default {
     write('people', list)
     return Promise.resolve(person)
   },
+  async deletePerson(id){
+    const list = read('people')
+    const filtered = list.filter(item => item.id !== id)
+    write('people', filtered)
+    return Promise.resolve()
+  },
 
   // Items
   async getItems(){
@@ -49,5 +61,11 @@ export default {
     list.unshift(item)
     write('items', list)
     return Promise.resolve(item)
+  },
+  async deleteItem(id){
+    const list = read('items')
+    const filtered = list.filter(item => item.id !== id)
+    write('items', filtered)
+    return Promise.resolve()
   }
 }

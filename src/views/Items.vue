@@ -2,7 +2,7 @@
   <div>
     <el-row>
       <el-col :span="14">
-        <h3>活动物品</h3>
+        <h3>🎁 活动物品展示</h3>
         <div class="card-grid">
           <el-card v-for="it in items" :key="it.id">
             <h4>{{ it.title }}</h4>
@@ -15,12 +15,14 @@
         </div>
       </el-col>
       <el-col :span="10">
-        <h3>添加物品</h3>
+        <h3>➕ 添加新物品</h3>
         <el-form label-position="top" :model="form">
           <el-form-item label="标题"><el-input v-model="form.title"/></el-form-item>
           <el-form-item label="收货时间"><el-date-picker v-model="form.receivedAt" type="date" style="width:100%"/></el-form-item>
           <el-form-item label="物品细节"><el-input v-model="form.details"/></el-form-item>
-          <el-form-item label="照片 URL（逗号分隔）"><el-input v-model="form.photos"/></el-form-item>
+          <el-form-item label="照片 URL（逗号分隔，例如: /images/activities/item-1.jpg">
+            <el-input v-model="form.photos" placeholder="国际URL 或 本地路径 /images/activities/..." />
+          </el-form-item>
           <el-button type="primary" @click="submit">添加</el-button>
         </el-form>
       </el-col>
