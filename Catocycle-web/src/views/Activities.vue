@@ -5,19 +5,19 @@
         <h3>🎉 活动记录 | 猫咪同欢</h3>
         <el-timeline>
           <el-timeline-item v-for="act in activities" :key="act.id" :timestamp="act.time">
-            <h4>{{ act.title }}</h4>
+            <h4 style="cursor:pointer;color:var(--accent)" @click="goToActivity(act.id)">{{ act.title }} →</h4>
             <p class="small muted">参与：{{ act.people }}</p>
             <p>{{ act.desc }}</p>
             <div v-if="act.photos && act.photos.length">
               <el-image v-for="(p,i) in act.photos" :key="i" :src="p" style="width:120px;margin-right:8px" fit="cover"/>
             </div>
-            <div style="margin-top:8px">
+            <div v-if="isAdmin" style="margin-top:8px">
               <el-button type="danger" size="small" @click="deleteAct(act.id)">删除</el-button>
             </div>
           </el-timeline-item>
         </el-timeline>
       </el-col>
-      <el-col :span="10">
+      <el-col v-if="isAdmin" :span="10">
         <h3>➕ 添加新活动</h3>
         <el-form label-position="top" :model="form">
           <el-form-item label="标题">
@@ -44,18 +44,24 @@
 
 <script>
 import api from '../services/api'
+import auth from '../services/auth'
 
 export default {
   data(){
     return {
       activities:[],
-      form:{title:'',time:'',people:'',desc:'',photos:''}
+      form:{title:'',time:'',people:'',desc:'',photos:''},
+      isAdmin: false
     }
   },
   async created(){
+    this.isAdmin = auth.isAdmin()
     this.activities = await api.getActivities()
   },
   methods:{
+    goToActivity(id) {
+      this.$router.push(`/activity/${id}`)
+    },
     async submit(){
       const payload = {
         title: this.form.title,

@@ -24,16 +24,41 @@
     <section style="margin-top:14px">
       <h3>🎉 特色活动</h3>
       <div class="card-grid">
-        <el-card v-for="n in 3" :key="n">
-          <h4>活动 {{ n }}</h4>
-          <p class="small muted">主题简介 — 时间与参与人数可在活动页查看 · 欢迎猫奴参与</p>
+        <el-card v-for="act in recentActivities" :key="act.id" class="activity-card" @click="goToActivity(act.id)">
+          <h4>{{ act.title }}</h4>
+          <p class="small muted">时间：{{ act.time }}</p>
+          <p class="small muted">参与：{{ act.people }}</p>
+          <p style="color:var(--muted);margin-top:8px">{{ act.desc.substring(0, 60) }}...</p>
+          <p style="text-align:right;color:var(--accent);margin-top:10px;cursor:pointer">查看详情 →</p>
         </el-card>
       </div>
     </section>
   </div>
 </template>
 
+<style scoped>
+.activity-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(160, 117, 74, 0.15);
+}
+
+.small {
+  font-size: 13px;
+}
+
+.muted {
+  color: var(--muted);
+}
+</style>
+
 <script>
+import api from '../services/api'
+
 export default {
   data(){
     return {
@@ -41,7 +66,18 @@ export default {
         '/images/carousel/p1.jpg',
         '/images/carousel/p2.jpg',
         '/images/carousel/p3.jpg'
-      ]
+      ],
+      recentActivities: []
+    }
+  },
+  async created() {
+    // 获取最近的活动（取前3条）
+    const activities = await api.getActivities()
+    this.recentActivities = activities.slice(0, 3)
+  },
+  methods: {
+    goToActivity(id) {
+      this.$router.push(`/activity/${id}`)
     }
   }
 }
