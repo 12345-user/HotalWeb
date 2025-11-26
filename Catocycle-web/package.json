@@ -1,6 +1,7 @@
 {
-  "name": "inn-frontend",
+  "name": "catocycle-web",
   "version": "1.0.0",
+  "description": "猫驼旅者客栈前端应用",
   "private": true,
   "scripts": {
     "dev": "vite",
