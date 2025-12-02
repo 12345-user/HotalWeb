@@ -2,7 +2,7 @@
   <div>
     <header class="site-header" v-if="$route.path !== '/login'">
       <div class="logo">🐱 猫驼旅者客栈</div>
-      <el-menu mode="horizontal" :default-active="$route.path" router>
+      <el-menu mode="horizontal" :default-active="$route.path" router :ellipsis="false">
         <el-menu-item index="/">主页</el-menu-item>
         <el-menu-item index="/activities">🎉 活动记录</el-menu-item>
         <el-menu-item index="/people">👥 人员介绍</el-menu-item>

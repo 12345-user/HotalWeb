@@ -23,28 +23,93 @@
 
     <section style="margin-top:14px">
       <h3>🎉 特色活动</h3>
-      <div class="card-grid">
-        <el-card v-for="act in recentActivities" :key="act.id" class="activity-card" @click="goToActivity(act.id)">
-          <h4>{{ act.title }}</h4>
-          <p class="small muted">时间：{{ act.time }}</p>
-          <p class="small muted">参与：{{ act.people }}</p>
-          <p style="color:var(--muted);margin-top:8px">{{ act.desc.substring(0, 60) }}...</p>
-          <p style="text-align:right;color:var(--accent);margin-top:10px;cursor:pointer">查看详情 →</p>
-        </el-card>
+      <div v-if="recentActivities.length" class="featured-activities">
+        <!-- 左侧第一条活动 -->
+        <div class="featured-slot">
+          <el-card
+            class="featured-card"
+            @click="goToActivity(recentActivities[0].id)"
+          >
+            <h4 class="featured-title">{{ recentActivities[0].title }}</h4>
+            <div
+              v-if="recentActivities[0].photos && recentActivities[0].photos.length"
+              class="featured-photo-wrap"
+            >
+              <el-image
+                :src="recentActivities[0].photos[0]"
+                class="featured-photo"
+                fit="cover"
+              />
+            </div>
+          </el-card>
+        </div>
+
+        <!-- 右侧预留位置：当有第二条活动时显示，否则留白 -->
+        <div class="featured-slot" v-if="recentActivities[1]">
+          <el-card
+            class="featured-card"
+            @click="goToActivity(recentActivities[1].id)"
+          >
+            <h4 class="featured-title">{{ recentActivities[1].title }}</h4>
+            <div
+              v-if="recentActivities[1].photos && recentActivities[1].photos.length"
+              class="featured-photo-wrap"
+            >
+              <el-image
+                :src="recentActivities[1].photos[0]"
+                class="featured-photo"
+                fit="cover"
+              />
+            </div>
+          </el-card>
+        </div>
+        <div
+          class="featured-slot placeholder"
+          v-else
+        ></div>
       </div>
     </section>
   </div>
 </template>
 
 <style scoped>
-.activity-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
+.featured-activities {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0;
 }
 
-.activity-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(160, 117, 74, 0.15);
+.featured-slot {
+  flex: 0 0 50%;
+}
+
+.featured-slot.placeholder {
+  /* 预留空位，不显示内容 */
+}
+
+.featured-card {
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
+}
+
+.featured-title {
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.featured-photo-wrap {
+  padding: 4px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(160, 117, 74, 0.9), rgba(245, 237, 227, 0.9));
+}
+
+.featured-photo {
+  width: 100%;
+  height: 230px;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
 }
 
 .small {

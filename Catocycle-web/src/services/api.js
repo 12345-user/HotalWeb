@@ -5,9 +5,61 @@ const api = axios.create({
   timeout: 5000
 })
 
+// 默认种子数据：5 条活动、5 个成员、10 个物品（可作为初始空白模板使用）
+// 单独定义第 1 条活动，便于在已有数据时也能自动补齐一次
+const FIRST_ACTIVITY = {
+  id: 1,
+  title: '环岛摩旅自驾',
+  time: '2025.1.25-2025.2.7',
+  people: '11人',
+  desc: '11人组队环岛，从东线到西线。',
+  photos: ['/images/activities/H1.jpg']
+}
+
+const DEFAULT_ACTIVITIES = [
+  FIRST_ACTIVITY,
+  // 其余几条留作空白占位，方便后续补充
+  ...Array.from({ length: 4 }).map((_, i) => ({
+    id: i + 2,
+    title: `活动 ${i + 2}`,
+    time: '',
+    people: '',
+    desc: '',
+    photos: []
+  }))
+]
+
+const DEFAULT_PEOPLE = Array.from({ length: 5 }).map((_, i) => ({
+  id: i + 1,
+  name: `成员 ${i + 1}`,
+  personality: '',
+  skills: '',
+  contact: '',
+  photos: []
+}))
+
+const DEFAULT_ITEMS = Array.from({ length: 10 }).map((_, i) => ({
+  id: i + 1,
+  name: `物品 ${i + 1}`,
+  time: '',
+  description: '',
+  image: ''
+}))
+
+const DEFAULT_MAP = {
+  activities: DEFAULT_ACTIVITIES,
+  people: DEFAULT_PEOPLE,
+  items: DEFAULT_ITEMS
+}
+
 // 本示例中没有真实后端，因此我们用 localStorage 做简单模拟
 function read(key){
   const raw = localStorage.getItem(key)
+  if (!raw && DEFAULT_MAP[key]) {
+    const seed = DEFAULT_MAP[key]
+    localStorage.setItem(key, JSON.stringify(seed))
+    return seed
+  }
   return raw ? JSON.parse(raw) : []
 }
 function write(key, data){
@@ -17,7 +69,16 @@ function write(key, data){
 export default {
   // Activities
   async getActivities(){
-    return Promise.resolve(read('activities'))
+    const list = read('activities')
+
+    // 如果还没有“环岛摩旅自驾”这条活动，自动补充一次
+    if (!list.some(a => a && a.title === FIRST_ACTIVITY.title)) {
+      const withFirst = [FIRST_ACTIVITY, ...list]
+      write('activities', withFirst)
+      return Promise.resolve(withFirst)
+    }
+
+    return Promise.resolve(list)
   },
   async addActivity(item){
     const list = read('activities')

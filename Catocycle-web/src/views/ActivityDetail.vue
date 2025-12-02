@@ -1,23 +1,24 @@
 <template>
   <div>
-    <el-button @click="$router.back()" type="info" style="margin-bottom:20px">← 返回</el-button>
+    <el-button @click="$router.back()" class="back-btn">← 返回</el-button>
     
-    <el-card v-if="activity">
+    <el-card v-if="activity" class="detail-card">
       <h2>{{ activity.title }}</h2>
-      <div style="margin-top:20px">
-        <p><strong>📅 时间：</strong> {{ activity.time }}</p>
-        <p><strong>👥 参与人员：</strong> {{ activity.people }}</p>
-        <p><strong>📝 活动描述：</strong></p>
-        <p style="white-space: pre-wrap; color: var(--muted)">{{ activity.desc }}</p>
-        
-        <div v-if="activity.photos && activity.photos.length" style="margin-top:20px">
+      <div class="detail-layout">
+        <div class="detail-text">
+          <p><strong>📅 时间：</strong> {{ activity.time }}</p>
+          <p><strong>👥 参与人员：</strong> {{ activity.people }}</p>
+          <p><strong>📝 活动描述：</strong></p>
+          <p class="detail-desc">{{ activity.desc }}</p>
+        </div>
+        <div class="detail-photo-col" v-if="activity.photos && activity.photos.length">
           <p><strong>📸 活动照片：</strong></p>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-top:10px">
-            <img 
-              v-for="(photo, i) in activity.photos" 
-              :key="i" 
-              :src="photo" 
-              style="width:100%;height:200px;object-fit:cover;border-radius:8px;cursor:pointer"
+          <div class="detail-photos">
+            <img
+              v-for="(photo, i) in activity.photos"
+              :key="i"
+              :src="photo"
+              class="detail-photo"
               @click="previewPhoto(photo)"
             />
           </div>
@@ -60,7 +61,28 @@ export default {
 <style scoped>
 h2 {
   color: var(--accent);
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+}
+
+.detail-card {
+  padding: 26px 28px;
+}
+
+.detail-layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.detail-text {
+  flex: 0 0 52%;
+}
+
+.detail-photo-col {
+  flex: 0 0 48%;
+  display: flex;
+  flex-direction: column;
 }
 
 p {
@@ -71,5 +93,39 @@ p {
 
 strong {
   color: var(--accent);
+}
+
+.detail-desc {
+  white-space: pre-wrap;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.detail-photos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.detail-photo {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.back-btn {
+  margin-bottom: 16px;
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.back-btn:hover {
+  background-color: #8b623f;
+  border-color: #8b623f;
+  color: #fff;
 }
 </style>

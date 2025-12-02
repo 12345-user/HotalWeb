@@ -5,17 +5,16 @@
         <h3>🎁 活动物品展示</h3>
         <div class="card-grid">
           <el-card v-for="it in items" :key="it.id" style="margin-bottom:12px">
-            <div style="display:flex;justify-content:space-between;align-items:start">
-              <div style="flex:1">
+            <div class="item-row">
+              <div class="item-info">
                 <h4>{{ it.name }}</h4>
                 <p class="small muted">时间：{{ it.time }}</p>
-                <p>{{ it.description }}</p>
-                <div v-if="it.image" style="margin-top:8px">
-                  <el-image :src="it.image" style="width:160px;height:120px" fit="cover"/>
-                </div>
+                <p><strong>介绍：</strong>{{ it.description }}</p>
               </div>
-              <div style="margin-left:12px;text-align:right">
-                <el-button size="mini" type="primary" @click="viewItem(it)">查看</el-button>
+              <div class="item-image-wrap" v-if="it.image">
+                <el-image :src="it.image" class="item-image" fit="cover"/>
+              </div>
+              <div class="item-actions">
                 <el-button v-if="isAdmin" size="mini" @click="onEdit(it)">编辑</el-button>
                 <el-button v-if="isAdmin" size="mini" type="danger" @click="onDelete(it.id)">删除</el-button>
               </div>
@@ -23,9 +22,8 @@
           </el-card>
         </div>
       </el-col>
-      <el-col :span="10">
-        <h3 v-if="isAdmin">{{ formMode === 'add' ? '➕ 添加新物品' : '✏️ 编辑物品' }}</h3>
-        <h3 v-else>物品详情（只读）</h3>
+      <el-col v-if="isAdmin" :span="10">
+        <h3>{{ formMode === 'add' ? '➕ 添加新物品' : '✏️ 编辑物品' }}</h3>
 
         <el-form label-position="top" :model="form">
           <el-form-item label="名称"><el-input v-model="form.name" :disabled="!isAdmin && formMode==='view'"/></el-form-item>
@@ -44,26 +42,10 @@
           <div style="margin-top:8px">
             <el-button v-if="isAdmin" type="primary" @click="submit">{{ formMode === 'add' ? '添加' : '保存' }}</el-button>
             <el-button v-if="isAdmin && formMode==='edit'" @click="cancelEdit">取消</el-button>
-            <el-button v-if="!isAdmin" @click="clearForm">清除</el-button>
           </div>
         </el-form>
       </el-col>
     </el-row>
-
-    <el-dialog :visible.sync="dialogVisible" width="520px">
-      <span slot="title">物品详情</span>
-      <div>
-        <h4>{{ detailItem.name }}</h4>
-        <p class="small muted">时间：{{ detailItem.time }}</p>
-        <p>{{ detailItem.description }}</p>
-        <div v-if="detailItem.image" style="margin-top:8px">
-          <el-image :src="detailItem.image" style="width:100%" fit="contain"/>
-        </div>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible=false">关闭</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -78,9 +60,7 @@ export default {
       isAdmin: auth.isAdmin(),
       formMode: 'add', // add | edit | view
       editingId: null,
-      form:{name:'',time:'',description:'',image:'',imagePreview:''},
-      dialogVisible:false,
-      detailItem:{}
+      form:{name:'',time:'',description:'',image:'',imagePreview:''}
     }
   },
   async created(){
@@ -140,11 +120,38 @@ export default {
       if(!ok) return
       await api.deleteItem(id)
       await this.loadItems()
-    },
-    viewItem(it){
-      this.detailItem = it
-      this.dialogVisible = true
     }
   }
 }
 </script>
+
+<style scoped>
+.item-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-image-wrap {
+  flex-shrink: 0;
+}
+
+.item-image {
+  width: 160px;
+  height: 120px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: 8px;
+}
+</style>

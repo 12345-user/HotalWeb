@@ -5,14 +5,27 @@
         <h3>🎉 活动记录 | 猫咪同欢</h3>
         <el-timeline>
           <el-timeline-item v-for="act in activities" :key="act.id" :timestamp="act.time">
-            <h4 style="cursor:pointer;color:var(--accent)" @click="goToActivity(act.id)">{{ act.title }} →</h4>
-            <p class="small muted">参与：{{ act.people }}</p>
-            <p>{{ act.desc }}</p>
-            <div v-if="act.photos && act.photos.length">
-              <el-image v-for="(p,i) in act.photos" :key="i" :src="p" style="width:120px;margin-right:8px" fit="cover"/>
+            <div class="activity-item-outer">
+              <div class="activity-item" @click="goToActivity(act.id)">
+                <div class="activity-col text">
+                  <h4 class="activity-title">{{ act.title }} →</h4>
+                  <p class="small muted">参与：{{ act.people }}</p>
+                  <p>{{ act.desc }}</p>
+                </div>
+                <div class="activity-col photo" v-if="act.photos && act.photos.length">
+                  <el-image
+                    :src="act.photos[0]"
+                    class="activity-photo-thumb"
+                    fit="cover"
+                  />
+                </div>
+                <div class="activity-col link">
+                  <span class="activity-more">查看详情 →</span>
+                </div>
+              </div>
             </div>
             <div v-if="isAdmin" style="margin-top:8px">
-              <el-button type="danger" size="small" @click="deleteAct(act.id)">删除</el-button>
+              <el-button type="danger" size="small" @click.stop="deleteAct(act.id)">删除</el-button>
             </div>
           </el-timeline-item>
         </el-timeline>
@@ -88,3 +101,57 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.activity-item-outer {
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(160, 117, 74, 0.35);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 237, 227, 0.9),
+    rgba(212, 181, 160, 0.5)
+  );
+}
+
+.activity-item {
+  cursor: pointer;
+  border: 1px solid rgba(160, 117, 74, 0.25);
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.activity-title {
+  color: var(--accent);
+  margin-top: 0;
+}
+
+.activity-more {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.activity-col.text {
+  flex: 1;
+}
+
+.activity-col.photo {
+  flex-shrink: 0;
+}
+
+.activity-photo-thumb {
+  width: 150px;
+  height: 110px;
+  border-radius: 8px;
+}
+
+.activity-col.link {
+  flex-shrink: 0;
+}
+</style>
