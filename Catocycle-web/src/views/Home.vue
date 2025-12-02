@@ -76,7 +76,7 @@
 .featured-activities {
   display: flex;
   justify-content: flex-start;
-  gap: 0;
+  gap: 24px;
 }
 
 .featured-slot {

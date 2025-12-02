@@ -80,9 +80,10 @@ h2 {
 }
 
 .detail-photo-col {
-  flex: 0 0 48%;
+  flex: 0 0 46%;
   display: flex;
   flex-direction: column;
+  padding-right: 8px;
 }
 
 p {

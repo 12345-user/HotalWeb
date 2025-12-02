@@ -6,7 +6,7 @@ const api = axios.create({
 })
 
 // 默认种子数据：5 条活动、5 个成员、10 个物品（可作为初始空白模板使用）
-// 单独定义第 1 条活动，便于在已有数据时也能自动补齐一次
+// 单独定义前两条活动，便于在已有数据时也能自动补齐一次
 const FIRST_ACTIVITY = {
   id: 1,
   title: '环岛摩旅自驾',
@@ -16,12 +16,22 @@ const FIRST_ACTIVITY = {
   photos: ['/images/activities/H1.jpg']
 }
 
+const SECOND_ACTIVITY = {
+  id: 2,
+  title: '沙滩露营',
+  time: '2025.4.3-2025.4.7',
+  people: '',
+  desc: '野地真人CS，露营，营火，沙地越野。',
+  photos: ['/images/activities/H3.jpg']
+}
+
 const DEFAULT_ACTIVITIES = [
   FIRST_ACTIVITY,
+  SECOND_ACTIVITY,
   // 其余几条留作空白占位，方便后续补充
-  ...Array.from({ length: 4 }).map((_, i) => ({
-    id: i + 2,
-    title: `活动 ${i + 2}`,
+  ...Array.from({ length: 3 }).map((_, i) => ({
+    id: i + 3,
+    title: `活动 ${i + 3}`,
     time: '',
     people: '',
     desc: '',
@@ -69,13 +79,24 @@ function write(key, data){
 export default {
   // Activities
   async getActivities(){
-    const list = read('activities')
+    let list = read('activities')
+
+    let changed = false
 
     // 如果还没有“环岛摩旅自驾”这条活动，自动补充一次
     if (!list.some(a => a && a.title === FIRST_ACTIVITY.title)) {
-      const withFirst = [FIRST_ACTIVITY, ...list]
-      write('activities', withFirst)
-      return Promise.resolve(withFirst)
+      list = [FIRST_ACTIVITY, ...list]
+      changed = true
+    }
+
+    // 如果还没有“沙滩露营”这条活动，同样自动补充一次
+    if (!list.some(a => a && a.title === SECOND_ACTIVITY.title)) {
+      list = [SECOND_ACTIVITY, ...list]
+      changed = true
+    }
+
+    if (changed) {
+      write('activities', list)
     }
 
     return Promise.resolve(list)
