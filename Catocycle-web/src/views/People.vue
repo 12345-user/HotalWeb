@@ -1,8 +1,7 @@
 <template>
   <div>
-    <el-row>
-      <el-col :span="16">
-        <h3>👥 人员介绍</h3>
+    <div class="people-container">
+      <h3 class="people-title">👥 人员介绍</h3>
 
         <!-- 普通访客：波浪形左右交错展示 -->
         <div v-if="!isAdmin" class="people-wave">
@@ -10,9 +9,13 @@
             v-for="(p, index) in people"
             :key="p.id"
             class="person-row"
-            :class="index % 2 === 0 ? 'left' : 'right'"
           >
             <el-card class="person-card">
+              <div class="person-info">
+                <h4>{{ p.name }}</h4>
+                <p class="small muted">简介：{{ p.personality }}</p>
+                <p class="small muted">联系方式：{{ p.contact }}</p>
+              </div>
               <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
                 <el-image
                   v-for="(photo, i) in p.photos"
@@ -22,41 +25,39 @@
                   fit="cover"
                 />
               </div>
-              <h4>{{ p.name }}</h4>
-              <p class="small muted">简介：{{ p.personality }}</p>
-              <p class="small muted">联系方式：{{ p.contact }}</p>
             </el-card>
           </div>
         </div>
 
         <!-- 管理员：仍然使用网格方便管理 -->
-        <div v-else class="card-grid">
-          <el-card v-for="p in people" :key="p.id">
-            <div v-if="p.photos && p.photos.length" style="margin-bottom:12px;display:flex;justify-content:center">
-              <el-image v-for="(photo, i) in p.photos" :key="i" :src="photo" style="width:85%;max-width:220px;aspect-ratio:1;object-fit:cover;border-radius:8px;margin-bottom:8px;transform:rotate(270deg)" fit="cover"/>
-            </div>
-            <h4>{{ p.name }}</h4>
-            <p class="small muted">简介：{{ p.personality }}</p>
-            <p class="small muted">联系方式：{{ p.contact }}</p>
-            <div style="margin-top:10px">
-              <el-button type="danger" size="small" @click="deletePer(p.id)">删除</el-button>
-            </div>
-          </el-card>
+        <div v-else class="people-wave">
+          <div
+            v-for="p in people"
+            :key="p.id"
+            class="person-row"
+          >
+            <el-card class="person-card">
+              <div class="person-info">
+                <h4>{{ p.name }}</h4>
+                <p class="small muted">简介：{{ p.personality }}</p>
+                <p class="small muted">联系方式：{{ p.contact }}</p>
+                <div style="margin-top:10px">
+                  <el-button type="danger" size="small" @click="deletePer(p.id)">删除</el-button>
+                </div>
+              </div>
+              <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
+                <el-image
+                  v-for="(photo, i) in p.photos"
+                  :key="i"
+                  :src="photo"
+                  class="person-photo"
+                  fit="cover"
+                />
+              </div>
+            </el-card>
+          </div>
         </div>
-      </el-col>
-      <el-col v-if="isAdmin" :span="8">
-        <h3>➕ 添加新人员</h3>
-        <el-form label-position="top" :model="form">
-          <el-form-item label="姓名"><el-input v-model="form.name"/></el-form-item>
-          <el-form-item label="简介"><el-input v-model="form.personality"/></el-form-item>
-          <el-form-item label="联系方式"><el-input v-model="form.contact"/></el-form-item>
-          <el-form-item label="照片 URL（逗号分隔）">
-            <el-input v-model="form.photos" placeholder="国际URL 或 本地路径 /images/activities/..." />
-          </el-form-item>
-          <el-button type="primary" @click="submit">添加</el-button>
-        </el-form>
-      </el-col>
-    </el-row>
+    </div>
   </div>
 </template>
 
@@ -68,7 +69,6 @@ export default {
   data(){
     return {
       people: [],
-      form: {name:'',personality:'',contact:'',photos:''},
       isAdmin: false
     }
   },
@@ -77,17 +77,6 @@ export default {
     this.people = await api.getPeople()
   },
   methods:{
-    async submit(){
-      const payload = {
-        name: this.form.name,
-        personality: this.form.personality,
-        contact: this.form.contact,
-        photos: this.form.photos ? this.form.photos.split(',').map(s => s.trim()) : []
-      }
-      await api.addPerson(payload)
-      this.people = await api.getPeople()
-      this.form = {name:'',personality:'',contact:'',photos:''}
-    },
     async deletePer(id){
       this.$confirm('确认删除此人员？', '提示', {
         confirmButtonText: '确认',
@@ -104,6 +93,16 @@ export default {
 </script>
 
 <style scoped>
+.people-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.people-title {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
 .people-wave {
   display: flex;
   flex-direction: column;
@@ -111,35 +110,30 @@ export default {
 }
 
 .person-row {
-  display: flex;
-}
-
-.person-row.left {
-  justify-content: flex-start;
-}
-
-.person-row.right {
-  justify-content: flex-end;
+  width: 100%;
 }
 
 .person-card {
-  width: 65%;
-  max-width: 360px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px;
+}
+
+.person-info {
+  flex: 1;
 }
 
 .person-photo-wrap {
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: center;
+  flex-shrink: 0;
 }
 
 .person-photo {
-  width: 85%;
-  max-width: 220px;
-  aspect-ratio: 1;
+  width: 160px;
+  height: 120px;
   object-fit: cover;
   border-radius: 8px;
-  margin-bottom: 8px;
   transform: rotate(270deg);
 }
 </style>
