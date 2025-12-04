@@ -39,14 +39,26 @@ const DEFAULT_ACTIVITIES = [
   }))
 ]
 
-const DEFAULT_PEOPLE = Array.from({ length: 5 }).map((_, i) => ({
-  id: i + 1,
-  name: `成员 ${i + 1}`,
-  personality: '',
-  skills: '',
+// 单独定义第一条人员，便于在已有数据时也能自动补齐一次
+const FIRST_PERSON = {
+  id: 1,
+  name: '留雨',
+  personality: '0.5个男人，会骑车，手工技艺，常年旅居',
   contact: '',
-  photos: []
-}))
+  photos: ['/images/person/person1.jpg']
+}
+
+const DEFAULT_PEOPLE = [
+  FIRST_PERSON,
+  // 其余几条留作空白占位，方便后续补充
+  ...Array.from({ length: 4 }).map((_, i) => ({
+    id: i + 2,
+    name: `成员 ${i + 2}`,
+    personality: '',
+    contact: '',
+    photos: []
+  }))
+]
 
 const DEFAULT_ITEMS = Array.from({ length: 10 }).map((_, i) => ({
   id: i + 1,
@@ -117,7 +129,15 @@ export default {
 
   // People
   async getPeople(){
-    return Promise.resolve(read('people'))
+    let list = read('people')
+
+    // 如果还没有“留雨”这条人员，自动补充一次
+    if (!list.some(p => p && p.name === FIRST_PERSON.name)) {
+      list = [FIRST_PERSON, ...list]
+      write('people', list)
+    }
+
+    return Promise.resolve(list)
   },
   async addPerson(person){
     const list = read('people')

@@ -32,8 +32,8 @@
         <!-- 管理员：仍然使用网格方便管理 -->
         <div v-else class="card-grid">
           <el-card v-for="p in people" :key="p.id">
-            <div v-if="p.photos && p.photos.length" style="margin-bottom:12px">
-              <el-image v-for="(photo, i) in p.photos" :key="i" :src="photo" style="width:100%;height:200px;object-fit:cover;border-radius:8px;margin-bottom:8px" fit="cover"/>
+            <div v-if="p.photos && p.photos.length" style="margin-bottom:12px;display:flex;justify-content:center">
+              <el-image v-for="(photo, i) in p.photos" :key="i" :src="photo" style="width:85%;max-width:220px;aspect-ratio:1;object-fit:cover;border-radius:8px;margin-bottom:8px;transform:rotate(270deg)" fit="cover"/>
             </div>
             <h4>{{ p.name }}</h4>
             <p class="small muted">简介：{{ p.personality }}</p>
@@ -123,19 +123,23 @@ export default {
 }
 
 .person-card {
-  width: 72%;
-  max-width: 480px;
+  width: 65%;
+  max-width: 360px;
 }
 
 .person-photo-wrap {
   margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
 }
 
 .person-photo {
-  width: 100%;
-  height: 200px;
+  width: 85%;
+  max-width: 220px;
+  aspect-ratio: 1;
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 8px;
+  transform: rotate(270deg);
 }
 </style>
