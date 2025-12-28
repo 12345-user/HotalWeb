@@ -146,6 +146,16 @@ export default {
     write('people', list)
     return Promise.resolve(person)
   },
+  async updatePerson(person){
+    const list = read('people')
+    const idx = list.findIndex(i => i.id === person.id)
+    if(idx !== -1){
+      list.splice(idx, 1, person)
+      write('people', list)
+      return Promise.resolve(person)
+    }
+    return Promise.reject(new Error('not found'))
+  },
   async deletePerson(id){
     const list = read('people')
     const filtered = list.filter(item => item.id !== id)

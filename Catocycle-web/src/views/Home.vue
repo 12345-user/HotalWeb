@@ -15,9 +15,9 @@
               <img src="/images/my-logo.jpg" class="logo-icon" alt="猫驼旅者客栈" />
               猫驼旅者客栈
             </h2>
-            <p class="muted small">淡棕色调 · 温暖舒适 · 手作茶点 · 良辰好景 · 猫咪陪伴</p>
+            <p class="muted small">温馨舒适 · 手工手作 · 良辰好景 · 猫咪陪伴</p>
             <el-card style="margin-top:12px">
-              <p>欢迎来到猫驼旅者客栈。我们重视慢时光与人情味，还有可爱的猫咪陪伴，定期举办文化与交流活动，欢迎关注活动记录。</p>
+              <p>欢迎来到猫驼旅者客栈。我们重视慢时光与人情味，还有组织手工体验与文化交流活动，欢迎关注小红书和抖音账号。</p>
             </el-card>
           </div>
         </el-col>
