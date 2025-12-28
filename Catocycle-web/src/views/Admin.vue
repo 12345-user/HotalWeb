@@ -150,6 +150,71 @@
           </el-col>
         </el-row>
       </el-tab-pane>
+
+      <!-- 活动物品管理 -->
+      <el-tab-pane label="🎁 活动物品管理">
+        <el-row :gutter="24">
+          <el-col :span="14">
+            <div class="items-list-section">
+              <h3>物品列表</h3>
+              <div class="items-card-grid">
+                <el-card v-for="it in items" :key="it.id" class="items-card">
+                  <div v-if="it.image" class="items-card-photo">
+                    <el-image :src="it.image" class="items-photo-img" fit="cover"/>
+                  </div>
+                  <div class="items-card-content">
+                    <h4 class="items-card-name">{{ it.name }}</h4>
+                    <p class="small muted" v-if="it.time">时间：{{ it.time }}</p>
+                    <p v-if="it.description" class="items-desc">{{ it.description }}</p>
+                    <div class="items-card-actions">
+                      <el-button type="primary" size="small" @click="editItem(it)">编辑</el-button>
+                      <el-button type="danger" size="small" @click="deleteItem(it.id)">删除</el-button>
+                    </div>
+                  </div>
+                </el-card>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="10">
+            <div class="items-form-section">
+              <h3>{{ itemFormMode === 'edit' ? '✏️ 编辑物品' : '➕ 添加新物品' }}</h3>
+              <el-card class="items-form-card">
+                <el-form label-position="top" :model="itemForm" class="items-form">
+                  <el-form-item label="名称">
+                    <el-input v-model="itemForm.name" placeholder="请输入物品名称"/>
+                  </el-form-item>
+                  <el-form-item label="时间">
+                    <el-date-picker v-model="itemForm.time" type="date" placeholder="选择时间" style="width:100%" />
+                  </el-form-item>
+                  <el-form-item label="描述">
+                    <el-input type="textarea" v-model="itemForm.description" :rows="3" placeholder="请输入物品描述"/>
+                  </el-form-item>
+                  <el-form-item label="照片">
+                    <div v-if="itemForm.imagePreview" class="photo-preview">
+                      <el-image :src="itemForm.imagePreview" class="photo-preview-img" fit="cover"/>
+                      <p class="small muted photo-path-hint">建议路径：{{ itemForm.suggestedPath }}</p>
+                    </div>
+                    <div class="photo-upload">
+                      <input type="file" accept="image/*" @change="onItemFileChange" class="photo-file-input" ref="itemFileInput"/>
+                      <el-button size="small" @click="triggerItemFileInput">选择文件</el-button>
+                    </div>
+                    <el-input 
+                      v-model="itemForm.image" 
+                      placeholder="照片路径，如：/images/item/item1.jpg"
+                      class="photo-path-input"
+                    />
+                    <p class="small muted photo-tip">💡 上传图片后会自动生成路径建议，请将图片保存到 public/images/item 目录</p>
+                  </el-form-item>
+                  <div class="form-actions">
+                    <el-button type="primary" @click="submitItem">{{ itemFormMode === 'edit' ? '保存' : '添加' }}</el-button>
+                    <el-button v-if="itemFormMode === 'edit'" @click="cancelEditItem">取消</el-button>
+                  </div>
+                </el-form>
+              </el-card>
+            </div>
+          </el-col>
+        </el-row>
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -163,12 +228,16 @@ export default {
     return {
       activities: [],
       people: [],
+      items: [],
       actForm: {title:'',time:'',people:'',desc:'',photos:'',imagePreview:'',suggestedPath:''},
       actFormMode: 'add', // 'add' | 'edit'
       editingActivityId: null,
       perForm: {name:'',personality:'',skills:'',contact:'',photos:'',imagePreview:'',suggestedPath:''},
       perFormMode: 'add', // 'add' | 'edit'
-      editingPersonId: null
+      editingPersonId: null,
+      itemForm: {name:'',time:'',description:'',image:'',imagePreview:'',suggestedPath:''},
+      itemFormMode: 'add', // 'add' | 'edit'
+      editingItemId: null
     }
   },
   async created() {
@@ -183,6 +252,7 @@ export default {
     async loadData() {
       this.activities = await api.getActivities()
       this.people = await api.getPeople()
+      this.items = await api.getItems()
     },
     triggerActivityFileInput() {
       this.$refs.activityFileInput?.click()
@@ -372,6 +442,88 @@ export default {
         await api.deletePerson(id)
         this.people = await api.getPeople()
         this.$message.success('人员已删除')
+      }).catch(() => {})
+    },
+    triggerItemFileInput() {
+      this.$refs.itemFileInput?.click()
+    },
+    onItemFileChange(e) {
+      const file = e.target.files && e.target.files[0]
+      if(!file) return
+      const reader = new FileReader()
+      reader.onload = () => {
+        this.itemForm.imagePreview = reader.result
+        // 自动生成建议路径：/images/item/{名称}.jpg
+        const name = this.itemForm.name || 'item'
+        const sanitizedName = name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '')
+        const fileExt = file.name.split('.').pop() || 'jpg'
+        this.itemForm.suggestedPath = `/images/item/${sanitizedName}.${fileExt}`
+        // 如果 image 为空，自动填入建议路径
+        if (!this.itemForm.image) {
+          this.itemForm.image = this.itemForm.suggestedPath
+        }
+      }
+      reader.readAsDataURL(file)
+    },
+    editItem(item) {
+      this.itemFormMode = 'edit'
+      this.editingItemId = item.id
+      this.itemForm = {
+        name: item.name || '',
+        time: item.time || '',
+        description: item.description || '',
+        image: item.image || '',
+        imagePreview: item.image || '',
+        suggestedPath: item.image || ''
+      }
+      // 滚动到表单
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    cancelEditItem() {
+      this.clearItemForm()
+    },
+    clearItemForm() {
+      this.itemForm = {name:'',time:'',description:'',image:'',imagePreview:'',suggestedPath:''}
+      this.itemFormMode = 'add'
+      this.editingItemId = null
+      // 清空文件输入
+      if (this.$refs.itemFileInput) {
+        this.$refs.itemFileInput.value = ''
+      }
+    },
+    async submitItem() {
+      if (!this.itemForm.name) {
+        this.$message.warning('请输入物品名称')
+        return
+      }
+      const payload = {
+        name: this.itemForm.name,
+        time: this.itemForm.time ? new Date(this.itemForm.time).toLocaleDateString() : '',
+        description: this.itemForm.description || '',
+        image: this.itemForm.image || ''
+      }
+      
+      if (this.itemFormMode === 'edit') {
+        payload.id = this.editingItemId
+        await api.updateItem(payload)
+        this.$message.success('物品信息已更新')
+      } else {
+        await api.addItem(payload)
+        this.$message.success('物品添加成功')
+      }
+      
+      this.items = await api.getItems()
+      this.clearItemForm()
+    },
+    async deleteItem(id) {
+      this.$confirm('确认删除此物品？', '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        await api.deleteItem(id)
+        this.items = await api.getItems()
+        this.$message.success('物品已删除')
       }).catch(() => {})
     },
     handleLogout() {
@@ -617,5 +769,89 @@ h3 {
 .activity-actions {
   display: flex;
   gap: 8px;
+}
+
+/* 活动物品管理样式 */
+.items-list-section {
+  margin-bottom: 20px;
+}
+
+.items-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.items-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+
+.items-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.items-card-photo {
+  margin-bottom: 12px;
+}
+
+.items-photo-img {
+  width: 100%;
+  height: 180px;
+  border-radius: 8px;
+  display: block;
+}
+
+.items-card-content {
+  padding: 0 4px;
+}
+
+.items-card-name {
+  color: var(--accent);
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.items-card-content .small {
+  margin: 6px 0;
+  line-height: 1.5;
+}
+
+.items-desc {
+  margin: 8px 0;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.items-card-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.items-form-section {
+  position: sticky;
+  top: 20px;
+}
+
+.items-form-card {
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.items-form {
+  margin-top: 10px;
+}
+
+.items-form .el-form-item {
+  margin-bottom: 20px;
+}
+
+.items-form .el-form-item__label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--accent);
 }
 </style>

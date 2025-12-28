@@ -18,6 +18,9 @@
         <el-button type="primary" @click="handleLogin" style="width:100%">登录</el-button>
       </el-form>
       <p v-if="error" style="color:red;text-align:center;margin-top:10px">{{ error }}</p>
+      <div style="margin-top:20px;text-align:center">
+        <el-button @click="goBack" style="width:100%">返回首页</el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -48,6 +51,9 @@ export default {
         this.error = '密码错误'
         this.form.password = ''
       }
+    },
+    goBack() {
+      this.$router.push('/')
     }
   }
 }

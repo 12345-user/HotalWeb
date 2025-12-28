@@ -13,6 +13,7 @@
       </el-menu>
       <div class="admin-section">
         <span v-if="isAdmin" style="color:var(--accent);margin-right:10px">👤 管理员</span>
+        <el-button v-if="isAdmin" type="primary" size="small" @click="$router.push('/admin')" style="margin-right:8px">进入Admin界面</el-button>
         <el-button v-if="isAdmin" type="danger" size="small" @click="handleLogout">登出</el-button>
         <el-button v-else type="primary" size="small" @click="$router.push('/login')">管理员</el-button>
       </div>

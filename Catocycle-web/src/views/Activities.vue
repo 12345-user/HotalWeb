@@ -41,9 +41,6 @@
                 </div>
               </div>
             </div>
-            <div v-if="isAdmin" style="margin-top:8px">
-              <el-button type="danger" size="small" @click.stop="deleteAct(act.id)">删除</el-button>
-            </div>
           </el-timeline-item>
         </el-timeline>
       </el-col>
@@ -53,17 +50,14 @@
 
 <script>
 import api from '../services/api'
-import auth from '../services/auth'
 
 export default {
   data(){
     return {
-      activities:[],
-      isAdmin: false
+      activities:[]
     }
   },
   async created(){
-    this.isAdmin = auth.isAdmin()
     this.activities = await api.getActivities()
   },
   methods:{
@@ -76,17 +70,6 @@ export default {
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
-    },
-    async deleteAct(id){
-      this.$confirm('确认删除此活动记录？', '提示', {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async () => {
-        await api.deleteActivity(id)
-        this.activities = await api.getActivities()
-        this.$message.success('活动已删除')
-      }).catch(() => {})
     }
   }
 }

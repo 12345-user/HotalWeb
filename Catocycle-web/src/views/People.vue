@@ -3,95 +3,47 @@
     <div class="people-container">
       <h3 class="people-title">👥 人员介绍</h3>
 
-        <!-- 普通访客：波浪形左右交错展示 -->
-        <div v-if="!isAdmin" class="people-wave">
-          <div
-            v-for="(p, index) in people"
-            :key="p.id"
-            class="person-row"
-          >
-            <el-card class="person-card">
-              <div class="person-card-inner">
-                <div class="person-info">
-                  <h4>{{ p.name }}</h4>
-                  <p class="small muted">简介：{{ p.personality }}</p>
-                  <p class="small muted">联系方式：{{ p.contact }}</p>
-                </div>
-                <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
-                  <el-image
-                    v-for="(photo, i) in p.photos"
-                    :key="i"
-                    :src="photo"
-                    class="person-photo"
-                    fit="cover"
-                  />
-                </div>
+      <div class="people-wave">
+        <div
+          v-for="(p, index) in people"
+          :key="p.id"
+          class="person-row"
+        >
+          <el-card class="person-card">
+            <div class="person-card-inner">
+              <div class="person-info">
+                <h4>{{ p.name }}</h4>
+                <p class="small muted">简介：{{ p.personality }}</p>
+                <p class="small muted">联系方式：{{ p.contact }}</p>
               </div>
-            </el-card>
-          </div>
-        </div>
-
-        <!-- 管理员：仍然使用网格方便管理 -->
-        <div v-else class="people-wave">
-          <div
-            v-for="p in people"
-            :key="p.id"
-            class="person-row"
-          >
-            <el-card class="person-card">
-              <div class="person-card-inner">
-                <div class="person-info">
-                  <h4>{{ p.name }}</h4>
-                  <p class="small muted">简介：{{ p.personality }}</p>
-                  <p class="small muted">联系方式：{{ p.contact }}</p>
-                  <div style="margin-top:10px">
-                    <el-button type="danger" size="small" @click="deletePer(p.id)">删除</el-button>
-                  </div>
-                </div>
-                <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
-                  <el-image
-                    v-for="(photo, i) in p.photos"
-                    :key="i"
-                    :src="photo"
-                    class="person-photo"
-                    fit="cover"
-                  />
-                </div>
+              <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
+                <el-image
+                  v-for="(photo, i) in p.photos"
+                  :key="i"
+                  :src="photo"
+                  class="person-photo"
+                  fit="cover"
+                />
               </div>
-            </el-card>
-          </div>
+            </div>
+          </el-card>
         </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import api from '../services/api'
-import auth from '../services/auth'
 
 export default {
   data(){
     return {
-      people: [],
-      isAdmin: false
+      people: []
     }
   },
   async created(){
-    this.isAdmin = auth.isAdmin()
     this.people = await api.getPeople()
-  },
-  methods:{
-    async deletePer(id){
-      this.$confirm('确认删除此人员？', '提示', {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async () => {
-        await api.deletePerson(id)
-        this.people = await api.getPeople()
-        this.$message.success('人员已删除')
-      }).catch(() => {})
-    }
   }
 }
 </script>
