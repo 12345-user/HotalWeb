@@ -19,7 +19,15 @@ body{
   align-items:center;
   justify-content:space-between;
 }
-.logo{font-weight:700;color:var(--accent);font-size:20px}
+.logo{font-weight:700;color:var(--accent);font-size:20px;display:flex;align-items:center;gap:8px}
+.logo-icon{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+  background-color:#F0D9C2; /* 淡棕色底 */
+  border-radius:50%;        /* 圆形 */
+  padding:6px;              /* 让图标不要贴边 */
+}
 .admin-section{display:flex;align-items:center}
 .main-container{padding:20px;max-width:1100px;margin:20px auto}
 .hero{

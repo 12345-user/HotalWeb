@@ -11,19 +11,21 @@
             class="person-row"
           >
             <el-card class="person-card">
-              <div class="person-info">
-                <h4>{{ p.name }}</h4>
-                <p class="small muted">简介：{{ p.personality }}</p>
-                <p class="small muted">联系方式：{{ p.contact }}</p>
-              </div>
-              <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
-                <el-image
-                  v-for="(photo, i) in p.photos"
-                  :key="i"
-                  :src="photo"
-                  class="person-photo"
-                  fit="cover"
-                />
+              <div class="person-card-inner">
+                <div class="person-info">
+                  <h4>{{ p.name }}</h4>
+                  <p class="small muted">简介：{{ p.personality }}</p>
+                  <p class="small muted">联系方式：{{ p.contact }}</p>
+                </div>
+                <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
+                  <el-image
+                    v-for="(photo, i) in p.photos"
+                    :key="i"
+                    :src="photo"
+                    class="person-photo"
+                    fit="cover"
+                  />
+                </div>
               </div>
             </el-card>
           </div>
@@ -37,22 +39,24 @@
             class="person-row"
           >
             <el-card class="person-card">
-              <div class="person-info">
-                <h4>{{ p.name }}</h4>
-                <p class="small muted">简介：{{ p.personality }}</p>
-                <p class="small muted">联系方式：{{ p.contact }}</p>
-                <div style="margin-top:10px">
-                  <el-button type="danger" size="small" @click="deletePer(p.id)">删除</el-button>
+              <div class="person-card-inner">
+                <div class="person-info">
+                  <h4>{{ p.name }}</h4>
+                  <p class="small muted">简介：{{ p.personality }}</p>
+                  <p class="small muted">联系方式：{{ p.contact }}</p>
+                  <div style="margin-top:10px">
+                    <el-button type="danger" size="small" @click="deletePer(p.id)">删除</el-button>
+                  </div>
                 </div>
-              </div>
-              <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
-                <el-image
-                  v-for="(photo, i) in p.photos"
-                  :key="i"
-                  :src="photo"
-                  class="person-photo"
-                  fit="cover"
-                />
+                <div v-if="p.photos && p.photos.length" class="person-photo-wrap">
+                  <el-image
+                    v-for="(photo, i) in p.photos"
+                    :key="i"
+                    :src="photo"
+                    class="person-photo"
+                    fit="cover"
+                  />
+                </div>
               </div>
             </el-card>
           </div>
@@ -114,6 +118,13 @@ export default {
 }
 
 .person-card {
+  border-radius: 16px;
+  border: 2px solid #e2c3a5; /* 浅棕色描边 */
+  background-color: #f8ecdf; /* 介于背景色和白色之间的浅棕色 */
+  box-shadow: none;
+}
+
+.person-card-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -127,13 +138,16 @@ export default {
 
 .person-photo-wrap {
   flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .person-photo {
   width: 160px;
   height: 120px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
   transform: rotate(270deg);
 }
 </style>

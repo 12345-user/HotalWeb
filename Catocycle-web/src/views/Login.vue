@@ -1,7 +1,10 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <h2>🐱 管理员登录</h2>
+      <h2 style="display:flex;align-items:center;gap:8px">
+        <img src="/images/my-logo.jpg" class="logo-icon" alt="管理员登录" />
+        管理员登录
+      </h2>
       <p class="subtitle">猫驼旅者客栈后台管理系统</p>
       <el-form :model="form" @keyup.enter="handleLogin">
         <el-form-item label="密码">

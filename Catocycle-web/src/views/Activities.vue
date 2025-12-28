@@ -1,11 +1,28 @@
 <template>
   <div>
     <el-row class="content-row">
-      <el-col :span="16">
+      <!-- 左侧时间定位导航 -->
+      <el-col :span="6" class="time-nav-col">
+        <h3 class="time-nav-title">🕒 时间定位</h3>
+        <ul class="time-nav-list">
+          <li
+            v-for="act in activities"
+            :key="`nav-${act.id}`"
+            class="time-nav-item"
+            @click="scrollToActivity(act.id)"
+          >
+            <span class="time-nav-time">{{ act.time || '未设置时间' }}</span>
+            <span class="time-nav-title-text">{{ act.title }}</span>
+          </li>
+        </ul>
+      </el-col>
+
+      <!-- 右侧活动时间线 -->
+      <el-col :span="18">
         <h3>🎉 活动记录 | 猫咪同欢</h3>
         <el-timeline>
           <el-timeline-item v-for="act in activities" :key="act.id" :timestamp="act.time">
-            <div class="activity-item-outer">
+            <div class="activity-item-outer" :id="`activity-${act.id}`">
               <div class="activity-item" @click="goToActivity(act.id)">
                 <div class="activity-col text">
                   <h4 class="activity-title">{{ act.title }} →</h4>
@@ -53,6 +70,13 @@ export default {
     goToActivity(id) {
       this.$router.push(`/activity/${id}`)
     },
+    scrollToActivity(id) {
+      // 根据左侧时间导航跳转到右侧对应记录
+      const el = this.$el.querySelector(`#activity-${id}`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    },
     async deleteAct(id){
       this.$confirm('确认删除此活动记录？', '提示', {
         confirmButtonText: '确认',
@@ -70,7 +94,49 @@ export default {
 
 <style scoped>
 .content-row {
-  justify-content: flex-end;
+  justify-content: space-between;
+}
+
+.time-nav-col {
+  padding-right: 18px;
+  border-right: 1px solid rgba(160, 117, 74, 0.3);
+}
+
+.time-nav-title {
+  color: var(--accent);
+  margin-top: 0;
+}
+
+.time-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-nav-item {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.time-nav-item:hover {
+  background-color: rgba(245, 237, 227, 0.9);
+  color: var(--accent);
+}
+
+.time-nav-time {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.time-nav-title-text {
+  opacity: 0.85;
 }
 
 .activity-item-outer {

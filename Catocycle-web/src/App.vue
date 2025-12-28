@@ -1,7 +1,10 @@
 <template>
   <div>
     <header class="site-header" v-if="$route.path !== '/login'">
-      <div class="logo">🐱 猫驼旅者客栈</div>
+      <div class="logo">
+        <img src="/images/my-logo.jpg" class="logo-icon" alt="猫驼旅者客栈" />
+        猫驼旅者客栈
+      </div>
       <el-menu mode="horizontal" :default-active="$route.path" router :ellipsis="false">
         <el-menu-item index="/">主页</el-menu-item>
         <el-menu-item index="/activities">🎉 活动记录</el-menu-item>

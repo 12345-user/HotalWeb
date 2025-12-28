@@ -1,10 +1,10 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="14">
+      <el-col :span="isAdmin ? 14 : 24">
         <h3>🎁 活动物品展示</h3>
-        <div class="card-grid">
-          <el-card v-for="it in items" :key="it.id" style="margin-bottom:12px">
+        <div class="items-grid">
+          <el-card v-for="it in items" :key="it.id" class="item-card">
             <div class="item-row">
               <div class="item-info">
                 <h4>{{ it.name }}</h4>
@@ -126,6 +126,16 @@ export default {
 </script>
 
 <style scoped>
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.item-card {
+  width: 100%;
+}
+
 .item-row {
   display: flex;
   align-items: flex-start;
