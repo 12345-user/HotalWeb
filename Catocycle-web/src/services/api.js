@@ -120,6 +120,16 @@ export default {
     write('activities', list)
     return Promise.resolve(item)
   },
+  async updateActivity(activity){
+    const list = read('activities')
+    const idx = list.findIndex(i => i.id === activity.id)
+    if(idx !== -1){
+      list.splice(idx, 1, activity)
+      write('activities', list)
+      return Promise.resolve(activity)
+    }
+    return Promise.reject(new Error('not found'))
+  },
   async deleteActivity(id){
     const list = read('activities')
     const filtered = list.filter(item => item.id !== id)
