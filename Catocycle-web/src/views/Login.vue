@@ -7,13 +7,35 @@
       </h2>
       <p class="subtitle">猫驼旅者客栈后台管理系统</p>
       <el-form :model="form" @keyup.enter="handleLogin">
+        <el-form-item label="账号">
+          <el-input 
+            v-model="form.username" 
+            placeholder="请输入管理员账号"
+            clearable
+          />
+        </el-form-item>
         <el-form-item label="密码">
           <el-input 
             v-model="form.password" 
             type="password" 
             placeholder="请输入管理员密码"
             show-password
+            clearable
           />
+        </el-form-item>
+        <el-form-item label="验证码">
+          <div style="display:flex;gap:10px;align-items:center">
+            <el-input 
+              v-model="form.captcha" 
+              placeholder="请输入验证码"
+              style="flex:1"
+              clearable
+              maxlength="4"
+            />
+            <div class="captcha-box" @click="refreshCaptcha" title="点击刷新验证码">
+              <span class="captcha-text">{{ captchaCode }}</span>
+            </div>
+          </div>
         </el-form-item>
         <el-button type="primary" @click="handleLogin" style="width:100%">登录</el-button>
       </el-form>
@@ -32,24 +54,54 @@ export default {
   data() {
     return {
       form: {
-        password: ''
+        username: '',
+        password: '',
+        captcha: ''
       },
-      error: ''
+      error: '',
+      captchaCode: ''
     }
   },
+  created() {
+    this.refreshCaptcha()
+  },
   methods: {
+    refreshCaptcha() {
+      this.captchaCode = auth.generateCaptcha()
+    },
     handleLogin() {
+      // 清空之前的错误信息
+      this.error = ''
+      
+      // 验证账号
+      if (!this.form.username) {
+        this.error = '请输入账号'
+        return
+      }
+      
+      // 验证密码
       if (!this.form.password) {
         this.error = '请输入密码'
         return
       }
       
-      if (auth.login(this.form.password)) {
-        this.$message.success('登录成功')
+      // 验证验证码
+      if (!this.form.captcha) {
+        this.error = '请输入验证码'
+        return
+      }
+      
+      // 调用登录验证
+      const result = auth.login(this.form.username, this.form.password, this.form.captcha, this.captchaCode)
+      
+      if (result.success) {
+        this.$message.success(result.message)
         this.$router.push('/admin')
       } else {
-        this.error = '密码错误'
+        this.error = result.message
         this.form.password = ''
+        this.form.captcha = ''
+        this.refreshCaptcha() // 登录失败后刷新验证码
       }
     },
     goBack() {
@@ -87,5 +139,29 @@ export default {
   color: var(--muted);
   font-size: 13px;
   margin-bottom: 20px;
+}
+
+.captcha-box {
+  width: 100px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.3s;
+}
+
+.captcha-box:hover {
+  opacity: 0.8;
+}
+
+.captcha-text {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
 }
 </style>
