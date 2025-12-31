@@ -23,7 +23,7 @@
       <router-view />
     </main>
 
-    <footer class="footer" v-if="$route.path !== '/login'">© 猫驼旅者客栈 | 简洁 · 高级 · 温暖 · 呵~</footer>
+    <footer class="footer" v-if="$route.path !== '/login'">© 猫驼旅者客栈</footer>
   </div>
 </template>
 
