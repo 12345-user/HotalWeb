@@ -50,7 +50,7 @@ export default {
 
 <style scoped>
 .people-container {
-  max-width: 900px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 
@@ -102,8 +102,8 @@ export default {
 }
 
 .person-photo {
-  width: 160px;
-  height: 120px;
+  width: 240px;
+  height: 170px;
   object-fit: cover;
   border-radius: 10px;
   border: 1px solid #e9d7c6;

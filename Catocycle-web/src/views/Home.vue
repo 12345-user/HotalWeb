@@ -3,9 +3,9 @@
     <section class="hero">
       <el-row :gutter="20">
         <el-col :xs="24" :sm="24" :md="16" :lg="16">
-          <el-carousel height="320px" indicator-position="outside">
+          <el-carousel height="420px" indicator-position="outside">
             <el-carousel-item v-for="(img,i) in images" :key="i">
-              <div style="height:320px;background-size:cover;background-position:center;border-radius:8px" :style="{backgroundImage: 'url('+img+')'}"></div>
+              <div style="height:420px;background-size:cover;background-position:center;border-radius:10px" :style="{backgroundImage: 'url('+img+')'}"></div>
             </el-carousel-item>
           </el-carousel>
         </el-col>
@@ -123,19 +123,26 @@
 
 .featured-photo {
   width: 100%;
-  height: 230px;
+  height: 300px;
   border-radius: 10px;
   object-fit: cover;
   display: block;
 }
 
 @media (max-width: 900px) {
+  .hero :deep(.el-carousel__container) {
+    height: 300px !important;
+  }
   .featured-activities {
     flex-direction: column;
   }
 
   .featured-slot {
     flex: 1 1 auto;
+  }
+
+  .featured-photo {
+    height: 230px;
   }
 }
 

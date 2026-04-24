@@ -137,7 +137,7 @@ export default {
   cursor: pointer;
   border: 1px solid rgba(160, 117, 74, 0.25);
   border-radius: 10px;
-  padding: 12px 16px;
+  padding: 16px 22px;
   background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   display: flex;
@@ -165,8 +165,8 @@ export default {
 }
 
 .activity-photo-thumb {
-  width: 150px;
-  height: 110px;
+  width: 220px;
+  height: 150px;
   border-radius: 8px;
 }
 

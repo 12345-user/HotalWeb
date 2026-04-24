@@ -38,8 +38,8 @@ export default {
 <style scoped>
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 20px;
 }
 
 .item-card {
@@ -56,7 +56,7 @@ export default {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 20px;
 }
 
 .item-info {
@@ -68,8 +68,8 @@ export default {
 }
 
 .item-image {
-  width: 160px;
-  height: 120px;
+  width: 220px;
+  height: 150px;
   border-radius: 10px;
   border: 1px solid #e9d7c6;
   object-fit: cover;
