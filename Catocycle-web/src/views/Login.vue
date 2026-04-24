@@ -69,7 +69,7 @@ export default {
     refreshCaptcha() {
       this.captchaCode = auth.generateCaptcha()
     },
-    handleLogin() {
+    async handleLogin() {
       // 清空之前的错误信息
       this.error = ''
       
@@ -92,7 +92,12 @@ export default {
       }
       
       // 调用登录验证
-      const result = auth.login(this.form.username, this.form.password, this.form.captcha, this.captchaCode)
+      const result = await auth.login(
+        this.form.username,
+        this.form.password,
+        this.form.captcha,
+        this.captchaCode
+      )
       
       if (result.success) {
         this.$message.success(result.message)

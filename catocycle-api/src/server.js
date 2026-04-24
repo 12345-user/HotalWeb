@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const crypto = require('crypto')
 const express = require('express')
 const cors = require('cors')
 const multer = require('multer')
@@ -12,6 +13,7 @@ const app = express()
 const port = Number(process.env.PORT || 3000)
 const uploadDir = process.env.UPLOAD_DIR || 'uploads'
 const uploadPath = path.resolve(process.cwd(), uploadDir)
+const sessionTtlHours = Number(process.env.ADMIN_SESSION_TTL_HOURS || 24)
 
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true })
@@ -31,6 +33,45 @@ const upload = multer({ storage })
 app.use(cors())
 app.use(express.json({ limit: '2mb' }))
 app.use('/uploads', express.static(uploadPath))
+
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(String(password)).digest('hex')
+}
+
+function createSessionToken() {
+  return crypto.randomBytes(48).toString('hex')
+}
+
+function getBearerToken(req) {
+  const authHeader = req.headers.authorization || ''
+  if (!authHeader.startsWith('Bearer ')) return ''
+  return authHeader.slice(7).trim()
+}
+
+async function requireAdmin(req, res, next) {
+  const token = getBearerToken(req)
+  if (!token) return res.status(401).json({ message: 'Unauthorized' })
+
+  const [rows] = await getPool().query(
+    `SELECT s.id, s.admin_id, a.username
+     FROM admin_sessions s
+     INNER JOIN admins a ON a.id = s.admin_id
+     WHERE s.token = ? AND s.expires_at > NOW()
+     LIMIT 1`,
+    [token]
+  )
+
+  if (!rows.length) {
+    return res.status(401).json({ message: 'Unauthorized' })
+  }
+
+  req.admin = {
+    id: Number(rows[0].admin_id),
+    username: rows[0].username,
+    token
+  }
+  return next()
+}
 
 function parseJsonArray(raw) {
   if (!raw) return []
@@ -98,7 +139,49 @@ app.get('/api/health', (_, res) => {
   res.json({ ok: true })
 })
 
-app.post('/api/upload', upload.single('file'), (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
+  const { username = '', password = '' } = req.body || {}
+  if (!username || !password) {
+    return res.status(400).json({ message: '用户名和密码不能为空' })
+  }
+
+  const [admins] = await getPool().query(
+    'SELECT id, username, password_hash FROM admins WHERE username = ? LIMIT 1',
+    [username]
+  )
+  if (!admins.length) {
+    return res.status(401).json({ message: '账号或密码错误' })
+  }
+
+  const admin = admins[0]
+  if (hashPassword(password) !== admin.password_hash) {
+    return res.status(401).json({ message: '账号或密码错误' })
+  }
+
+  const token = createSessionToken()
+  await getPool().query('DELETE FROM admin_sessions WHERE admin_id = ?', [admin.id])
+  await getPool().query(
+    'INSERT INTO admin_sessions (admin_id, token, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? HOUR))',
+    [admin.id, token, sessionTtlHours]
+  )
+
+  return res.json({
+    token,
+    admin: { username: admin.username },
+    expiresInHours: sessionTtlHours
+  })
+})
+
+app.get('/api/auth/me', requireAdmin, (req, res) => {
+  res.json({ username: req.admin.username })
+})
+
+app.post('/api/auth/logout', requireAdmin, async (req, res) => {
+  await getPool().query('DELETE FROM admin_sessions WHERE token = ?', [req.admin.token])
+  res.status(204).end()
+})
+
+app.post('/api/upload', requireAdmin, upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded.' })
   }
@@ -115,7 +198,7 @@ app.get('/api/activities', async (_, res) => {
   res.json(rows.map(toActivity))
 })
 
-app.post('/api/activities', async (req, res) => {
+app.post('/api/activities', requireAdmin, async (req, res) => {
   const { title, time = '', people = '', desc = '', photos = [] } = req.body
   const [result] = await getPool().query(
     'INSERT INTO activities (title, time, people, `desc`, photos) VALUES (?, ?, ?, ?, ?)',
@@ -128,7 +211,7 @@ app.post('/api/activities', async (req, res) => {
   res.status(201).json(toActivity(rows[0]))
 })
 
-app.put('/api/activities/:id', async (req, res) => {
+app.put('/api/activities/:id', requireAdmin, async (req, res) => {
   const id = Number(req.params.id)
   const { title, time = '', people = '', desc = '', photos = [] } = req.body
   await getPool().query(
@@ -143,7 +226,7 @@ app.put('/api/activities/:id', async (req, res) => {
   res.json(toActivity(rows[0]))
 })
 
-app.delete('/api/activities/:id', async (req, res) => {
+app.delete('/api/activities/:id', requireAdmin, async (req, res) => {
   const id = Number(req.params.id)
   const [rows] = await getPool().query(
     'SELECT CAST(photos AS CHAR(10000) CHARACTER SET utf8mb4) AS photos FROM activities WHERE id = ?',
@@ -164,7 +247,7 @@ app.get('/api/people', async (_, res) => {
   res.json(rows.map(toPerson))
 })
 
-app.post('/api/people', async (req, res) => {
+app.post('/api/people', requireAdmin, async (req, res) => {
   const { name, personality = '', skills = '', contact = '', photos = [] } = req.body
   const [result] = await getPool().query(
     'INSERT INTO people (name, personality, skills, contact, photos) VALUES (?, ?, ?, ?, ?)',
@@ -177,7 +260,7 @@ app.post('/api/people', async (req, res) => {
   res.status(201).json(toPerson(rows[0]))
 })
 
-app.put('/api/people/:id', async (req, res) => {
+app.put('/api/people/:id', requireAdmin, async (req, res) => {
   const id = Number(req.params.id)
   const { name, personality = '', skills = '', contact = '', photos = [] } = req.body
   await getPool().query(
@@ -192,7 +275,7 @@ app.put('/api/people/:id', async (req, res) => {
   res.json(toPerson(rows[0]))
 })
 
-app.delete('/api/people/:id', async (req, res) => {
+app.delete('/api/people/:id', requireAdmin, async (req, res) => {
   const id = Number(req.params.id)
   const [rows] = await getPool().query(
     'SELECT CAST(photos AS CHAR(10000) CHARACTER SET utf8mb4) AS photos FROM people WHERE id = ?',
@@ -218,7 +301,7 @@ app.get('/api/items/:id', async (req, res) => {
   res.json(toItem(rows[0]))
 })
 
-app.post('/api/items', async (req, res) => {
+app.post('/api/items', requireAdmin, async (req, res) => {
   const { name, time = '', description = '', image = '' } = req.body
   const [result] = await getPool().query(
     'INSERT INTO items (name, time, description, image) VALUES (?, ?, ?, ?)',
@@ -228,7 +311,7 @@ app.post('/api/items', async (req, res) => {
   res.status(201).json(toItem(rows[0]))
 })
 
-app.put('/api/items/:id', async (req, res) => {
+app.put('/api/items/:id', requireAdmin, async (req, res) => {
   const id = Number(req.params.id)
   const { name, time = '', description = '', image = '' } = req.body
   await getPool().query(
@@ -240,7 +323,7 @@ app.put('/api/items/:id', async (req, res) => {
   res.json(toItem(rows[0]))
 })
 
-app.delete('/api/items/:id', async (req, res) => {
+app.delete('/api/items/:id', requireAdmin, async (req, res) => {
   const id = Number(req.params.id)
   const [rows] = await getPool().query('SELECT image FROM items WHERE id = ?', [id])
   if (rows.length) {

@@ -70,6 +70,29 @@ async function initDatabase() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
   `)
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS admins (
+      id BIGINT PRIMARY KEY AUTO_INCREMENT,
+      username VARCHAR(64) NOT NULL UNIQUE,
+      password_hash CHAR(64) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `)
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS admin_sessions (
+      id BIGINT PRIMARY KEY AUTO_INCREMENT,
+      admin_id BIGINT NOT NULL,
+      token CHAR(96) NOT NULL UNIQUE,
+      expires_at DATETIME NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_admin_sessions_token (token),
+      INDEX idx_admin_sessions_admin_id (admin_id),
+      CONSTRAINT fk_admin_sessions_admin FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
+    )
+  `)
 }
 
 function getPool() {

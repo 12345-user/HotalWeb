@@ -242,7 +242,7 @@ export default {
   },
   async created() {
     // 检查是否登录
-    if (!auth.isAdmin()) {
+    if (!(await auth.verifyAdmin())) {
       this.$router.push('/login')
       return
     }
@@ -491,8 +491,8 @@ export default {
         this.$message.success('物品已删除')
       }).catch(() => {})
     },
-    handleLogout() {
-      auth.logout()
+    async handleLogout() {
+      await auth.logout()
       this.$message.success('已登出')
       this.$router.push('/login')
     }

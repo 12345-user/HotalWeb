@@ -49,8 +49,8 @@ export default {
     checkAdmin() {
       this.isAdmin = auth.isAdmin()
     },
-    handleLogout() {
-      auth.logout()
+    async handleLogout() {
+      await auth.logout()
       this.isAdmin = false
       this.$message.success('已登出')
       this.$router.push('/')

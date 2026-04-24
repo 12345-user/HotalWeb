@@ -9,6 +9,13 @@ async function hasRows(tableName) {
 async function seedIfEmpty() {
   const pool = getPool()
 
+  // Reset all legacy admin account data and keep a single authoritative admin account.
+  await pool.query('DELETE FROM admin_sessions')
+  await pool.query('DELETE FROM admins')
+  await pool.query(
+    "INSERT INTO admins (username, password_hash) VALUES ('rovin', SHA2('109901', 256))"
+  )
+
   if (!(await hasRows('activities'))) {
     await pool.query(
       'INSERT INTO activities (title, time, people, `desc`, photos) VALUES (?, ?, ?, ?, ?), (?, ?, ?, ?, ?)',
