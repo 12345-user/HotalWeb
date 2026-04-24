@@ -6,6 +6,7 @@ import {
 } from './modules/activities.service'
 import { addPerson, deletePerson, getPeople, updatePerson } from './modules/people.service'
 import { addItem, deleteItem, getItem, getItems, updateItem } from './modules/items.service'
+import { uploadImage } from './modules/upload.service'
 
 const api = {
   // Activities
@@ -25,7 +26,10 @@ const api = {
   addItem,
   getItem,
   updateItem,
-  deleteItem
+  deleteItem,
+
+  // Upload
+  uploadImage
 }
 
 export default api

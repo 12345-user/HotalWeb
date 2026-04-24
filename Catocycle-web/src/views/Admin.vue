@@ -9,7 +9,7 @@
       <!-- 活动管理 -->
       <el-tab-pane label="🎉 活动管理">
         <el-row :gutter="24">
-          <el-col :span="14">
+          <el-col :xs="24" :sm="24" :md="14" :lg="14">
             <div class="activity-list-section">
               <h3>活动列表</h3>
               <el-timeline class="activity-timeline">
@@ -36,7 +36,7 @@
               </el-timeline>
             </div>
           </el-col>
-          <el-col :span="10">
+          <el-col :xs="24" :sm="24" :md="10" :lg="10">
             <div class="activity-form-section">
               <h3>{{ actFormMode === 'edit' ? '✏️ 编辑活动' : '➕ 添加新活动' }}</h3>
               <el-card class="activity-form-card">
@@ -69,7 +69,7 @@
                       placeholder="照片路径，如：/images/activities/H1.jpg（多个用逗号分隔）"
                       class="photo-path-input"
                     />
-                    <p class="small muted photo-tip">💡 上传图片后会自动生成路径建议，请将图片保存到 public/images/activities 目录</p>
+                    <p class="small muted photo-tip">图片会上传到服务器并自动写入图片地址</p>
                   </el-form-item>
                   <div class="form-actions">
                     <el-button type="primary" @click="submitActivity">{{ actFormMode === 'edit' ? '保存' : '添加' }}</el-button>
@@ -85,7 +85,7 @@
       <!-- 人员管理 -->
       <el-tab-pane label="👥 人员管理">
         <el-row :gutter="24">
-          <el-col :span="14">
+          <el-col :xs="24" :sm="24" :md="14" :lg="14">
             <div class="people-list-section">
               <h3>人员列表</h3>
               <div class="people-card-grid">
@@ -107,7 +107,7 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="10">
+          <el-col :xs="24" :sm="24" :md="10" :lg="10">
             <div class="people-form-section">
               <h3>{{ perFormMode === 'edit' ? '✏️ 编辑人员' : '➕ 添加新人员' }}</h3>
               <el-card class="people-form-card">
@@ -138,7 +138,7 @@
                       placeholder="照片路径，如：/images/person/person1.jpg（多个用逗号分隔）"
                       class="photo-path-input"
                     />
-                    <p class="small muted photo-tip">💡 上传图片后会自动生成路径建议，请将图片保存到 public/images/person 目录</p>
+                    <p class="small muted photo-tip">图片会上传到服务器并自动写入图片地址</p>
                   </el-form-item>
                   <div class="form-actions">
                     <el-button type="primary" @click="submitPerson">{{ perFormMode === 'edit' ? '保存' : '添加' }}</el-button>
@@ -154,7 +154,7 @@
       <!-- 活动物品管理 -->
       <el-tab-pane label="🎁 活动物品管理">
         <el-row :gutter="24">
-          <el-col :span="14">
+          <el-col :xs="24" :sm="24" :md="14" :lg="14">
             <div class="items-list-section">
               <h3>物品列表</h3>
               <div class="items-card-grid">
@@ -175,7 +175,7 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="10">
+          <el-col :xs="24" :sm="24" :md="10" :lg="10">
             <div class="items-form-section">
               <h3>{{ itemFormMode === 'edit' ? '✏️ 编辑物品' : '➕ 添加新物品' }}</h3>
               <el-card class="items-form-card">
@@ -203,7 +203,7 @@
                       placeholder="照片路径，如：/images/item/item1.jpg"
                       class="photo-path-input"
                     />
-                    <p class="small muted photo-tip">💡 上传图片后会自动生成路径建议，请将图片保存到 public/images/item 目录</p>
+                    <p class="small muted photo-tip">图片会上传到服务器并自动写入图片地址</p>
                   </el-form-item>
                   <div class="form-actions">
                     <el-button type="primary" @click="submitItem">{{ itemFormMode === 'edit' ? '保存' : '添加' }}</el-button>
@@ -260,45 +260,21 @@ export default {
     triggerPersonFileInput() {
       this.$refs.personFileInput?.click()
     },
-    onActivityFileChange(e) {
+    async onActivityFileChange(e) {
       const files = e.target.files
       if(!files || files.length === 0) return
-      
       const fileArray = Array.from(files)
-      const paths = []
-      const previews = []
-      
-      fileArray.forEach((file, index) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          previews.push(reader.result)
-          
-          // 自动生成建议路径：/images/activities/{标题或时间戳}_{序号}.jpg
-          const title = this.actForm.title || 'activity'
-          const sanitizedTitle = title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '')
-          const fileExt = file.name.split('.').pop() || 'jpg'
-          const timestamp = Date.now()
-          const fileName = `${sanitizedTitle}_${timestamp}_${index + 1}.${fileExt}`
-          const suggestedPath = `/images/activities/${fileName}`
-          
-          paths.push(suggestedPath)
-          
-          // 如果所有文件都读取完成，更新表单
-          if (previews.length === fileArray.length) {
-            this.actForm.imagePreview = previews[0] // 只显示第一张预览
-            this.actForm.suggestedPath = paths.join(', ')
-            // 如果 photos 为空，自动填入建议路径
-            if (!this.actForm.photos) {
-              this.actForm.photos = paths.join(',')
-            } else {
-              // 如果已有路径，追加新路径
-              const existingPaths = this.actForm.photos.split(',').map(s => s.trim()).filter(s => s)
-              this.actForm.photos = [...existingPaths, ...paths].join(',')
-            }
-          }
-        }
-        reader.readAsDataURL(file)
-      })
+      const uploadResults = await Promise.all(fileArray.map((file) => api.uploadImage(file)))
+      const paths = uploadResults.map((result) => result.path)
+      this.actForm.imagePreview = paths[0] || ''
+      this.actForm.suggestedPath = paths.join(', ')
+      if (!this.actForm.photos) {
+        this.actForm.photos = paths.join(',')
+      } else {
+        const existingPaths = this.actForm.photos.split(',').map((s) => s.trim()).filter((s) => s)
+        this.actForm.photos = [...existingPaths, ...paths].join(',')
+      }
+      this.$message.success('活动图片上传成功')
     },
     editActivity(activity) {
       this.actFormMode = 'edit'
@@ -363,23 +339,19 @@ export default {
         this.$message.success('活动已删除')
       }).catch(() => {})
     },
-    onPersonFileChange(e) {
+    async onPersonFileChange(e) {
       const file = e.target.files && e.target.files[0]
       if(!file) return
-      const reader = new FileReader()
-      reader.onload = () => {
-        this.perForm.imagePreview = reader.result
-        // 自动生成建议路径：/images/person/person{id或name}.jpg
-        const name = this.perForm.name || 'person'
-        const sanitizedName = name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '')
-        const fileExt = file.name.split('.').pop() || 'jpg'
-        this.perForm.suggestedPath = `/images/person/${sanitizedName}.${fileExt}`
-        // 如果 photos 为空，自动填入建议路径
-        if (!this.perForm.photos) {
-          this.perForm.photos = this.perForm.suggestedPath
-        }
+      const result = await api.uploadImage(file)
+      this.perForm.imagePreview = result.path
+      this.perForm.suggestedPath = result.path
+      if (!this.perForm.photos) {
+        this.perForm.photos = result.path
+      } else {
+        const existingPaths = this.perForm.photos.split(',').map((s) => s.trim()).filter((s) => s)
+        this.perForm.photos = [...existingPaths, result.path].join(',')
       }
-      reader.readAsDataURL(file)
+      this.$message.success('人员图片上传成功')
     },
     editPerson(person) {
       this.perFormMode = 'edit'
@@ -447,23 +419,16 @@ export default {
     triggerItemFileInput() {
       this.$refs.itemFileInput?.click()
     },
-    onItemFileChange(e) {
+    async onItemFileChange(e) {
       const file = e.target.files && e.target.files[0]
       if(!file) return
-      const reader = new FileReader()
-      reader.onload = () => {
-        this.itemForm.imagePreview = reader.result
-        // 自动生成建议路径：/images/item/{名称}.jpg
-        const name = this.itemForm.name || 'item'
-        const sanitizedName = name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '')
-        const fileExt = file.name.split('.').pop() || 'jpg'
-        this.itemForm.suggestedPath = `/images/item/${sanitizedName}.${fileExt}`
-        // 如果 image 为空，自动填入建议路径
-        if (!this.itemForm.image) {
-          this.itemForm.image = this.itemForm.suggestedPath
-        }
+      const result = await api.uploadImage(file)
+      this.itemForm.imagePreview = result.path
+      this.itemForm.suggestedPath = result.path
+      if (!this.itemForm.image) {
+        this.itemForm.image = result.path
       }
-      reader.readAsDataURL(file)
+      this.$message.success('物品图片上传成功')
     },
     editItem(item) {
       this.itemFormMode = 'edit'

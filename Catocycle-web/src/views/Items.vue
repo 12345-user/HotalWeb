@@ -38,12 +38,18 @@ export default {
 <style scoped>
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
 }
 
 .item-card {
   width: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 24px rgba(113, 76, 48, 0.16);
 }
 
 .item-row {
@@ -64,7 +70,8 @@ export default {
 .item-image {
   width: 160px;
   height: 120px;
-  border-radius: 6px;
+  border-radius: 10px;
+  border: 1px solid #e9d7c6;
   object-fit: cover;
 }
 </style>

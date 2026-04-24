@@ -2,14 +2,14 @@
   <div>
     <section class="hero">
       <el-row :gutter="20">
-        <el-col :span="16">
+        <el-col :xs="24" :sm="24" :md="16" :lg="16">
           <el-carousel height="320px" indicator-position="outside">
             <el-carousel-item v-for="(img,i) in images" :key="i">
               <div style="height:320px;background-size:cover;background-position:center;border-radius:8px" :style="{backgroundImage: 'url('+img+')'}"></div>
             </el-carousel-item>
           </el-carousel>
         </el-col>
-        <el-col :span="8">
+        <el-col :xs="24" :sm="24" :md="8" :lg="8">
           <div style="padding:12px">
             <h2 style="color:var(--accent);display:flex;align-items:center;gap:8px">
               <img src="/images/my-logo.jpg" class="logo-icon" alt="猫驼旅者客栈" />
@@ -76,6 +76,14 @@
 </template>
 
 <style scoped>
+.hero :deep(.el-carousel__container) {
+  border-radius: 12px;
+}
+
+.hero :deep(.el-carousel__indicator button) {
+  background-color: rgba(122, 79, 42, 0.35);
+}
+
 .featured-activities {
   display: flex;
   justify-content: flex-start;
@@ -94,6 +102,12 @@
   width: 100%;
   cursor: pointer;
   text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.featured-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 24px rgba(113, 76, 48, 0.14);
 }
 
 .featured-title {
@@ -113,6 +127,16 @@
   border-radius: 10px;
   object-fit: cover;
   display: block;
+}
+
+@media (max-width: 900px) {
+  .featured-activities {
+    flex-direction: column;
+  }
+
+  .featured-slot {
+    flex: 1 1 auto;
+  }
 }
 
 .small {

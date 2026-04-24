@@ -71,9 +71,15 @@ export default {
 
 .person-card {
   border-radius: 16px;
-  border: 2px solid #e2c3a5; /* 浅棕色描边 */
-  background-color: #f8ecdf; /* 介于背景色和白色之间的浅棕色 */
-  box-shadow: none;
+  border: 1px solid #e2c3a5;
+  background-color: #fff9f3;
+  box-shadow: 0 10px 20px rgba(113, 76, 48, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.person-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 24px rgba(113, 76, 48, 0.16);
 }
 
 .person-card-inner {
@@ -100,6 +106,13 @@ export default {
   height: 120px;
   object-fit: cover;
   border-radius: 10px;
-  transform: rotate(270deg);
+  border: 1px solid #e9d7c6;
+}
+
+@media (max-width: 860px) {
+  .person-card-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>

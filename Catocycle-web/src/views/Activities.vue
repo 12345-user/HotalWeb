@@ -2,7 +2,7 @@
   <div>
     <el-row class="content-row">
       <!-- 左侧时间定位导航 -->
-      <el-col :span="6" class="time-nav-col">
+      <el-col :xs="24" :sm="24" :md="7" :lg="6" class="time-nav-col">
         <h3 class="time-nav-title">🕒 时间定位</h3>
         <ul class="time-nav-list">
           <li
@@ -18,7 +18,7 @@
       </el-col>
 
       <!-- 右侧活动时间线 -->
-      <el-col :span="18">
+      <el-col :xs="24" :sm="24" :md="17" :lg="18">
         <h3>🎉 活动记录 | 猫咪同欢</h3>
         <el-timeline>
           <el-timeline-item v-for="act in activities" :key="act.id" :timestamp="act.time">
@@ -172,5 +172,26 @@ export default {
 
 .activity-col.link {
   flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .time-nav-col {
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+  }
+
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .activity-photo-thumb {
+    width: 100%;
+    height: 200px;
+  }
 }
 </style>

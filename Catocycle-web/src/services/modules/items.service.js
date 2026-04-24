@@ -1,37 +1,25 @@
-import { read, write } from '../mock/storage'
+import http from '../http'
 
 export async function getItems() {
-  return Promise.resolve(read('items'))
+  const { data } = await http.get('/items')
+  return data
 }
 
 export async function addItem(item) {
-  const list = read('items')
-  item.id = Date.now()
-  list.unshift(item)
-  write('items', list)
-  return Promise.resolve(item)
+  const { data } = await http.post('/items', item)
+  return data
 }
 
 export async function getItem(id) {
-  const list = read('items')
-  const found = list.find((i) => i.id === id)
-  return Promise.resolve(found)
+  const { data } = await http.get(`/items/${id}`)
+  return data
 }
 
 export async function updateItem(item) {
-  const list = read('items')
-  const idx = list.findIndex((i) => i.id === item.id)
-  if (idx !== -1) {
-    list.splice(idx, 1, item)
-    write('items', list)
-    return Promise.resolve(item)
-  }
-  return Promise.reject(new Error('not found'))
+  const { data } = await http.put(`/items/${item.id}`, item)
+  return data
 }
 
 export async function deleteItem(id) {
-  const list = read('items')
-  const filtered = list.filter((item) => item.id !== id)
-  write('items', filtered)
-  return Promise.resolve()
+  await http.delete(`/items/${id}`)
 }

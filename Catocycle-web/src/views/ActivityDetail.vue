@@ -66,6 +66,7 @@ h2 {
 
 .detail-card {
   padding: 26px 28px;
+  border-radius: 16px;
 }
 
 .detail-layout {
@@ -113,8 +114,26 @@ strong {
   width: 100%;
   max-height: 320px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 1px solid #e9d7c6;
   cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .detail-card {
+    padding: 16px;
+  }
+  .detail-layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .detail-text,
+  .detail-photo-col {
+    flex: 1 1 auto;
+  }
+  .detail-photo {
+    max-height: 420px;
+  }
 }
 
 .back-btn {

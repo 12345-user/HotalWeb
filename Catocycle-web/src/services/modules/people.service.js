@@ -1,39 +1,20 @@
-import { read, write } from '../mock/storage'
-import { FIRST_PERSON } from '../mock/seeds'
+import http from '../http'
 
 export async function getPeople() {
-  let list = read('people')
-
-  if (!list.some((p) => p && p.name === FIRST_PERSON.name)) {
-    list = [FIRST_PERSON, ...list]
-    write('people', list)
-  }
-
-  return Promise.resolve(list)
+  const { data } = await http.get('/people')
+  return data
 }
 
 export async function addPerson(person) {
-  const list = read('people')
-  person.id = Date.now()
-  list.unshift(person)
-  write('people', list)
-  return Promise.resolve(person)
+  const { data } = await http.post('/people', person)
+  return data
 }
 
 export async function updatePerson(person) {
-  const list = read('people')
-  const idx = list.findIndex((i) => i.id === person.id)
-  if (idx !== -1) {
-    list.splice(idx, 1, person)
-    write('people', list)
-    return Promise.resolve(person)
-  }
-  return Promise.reject(new Error('not found'))
+  const { data } = await http.put(`/people/${person.id}`, person)
+  return data
 }
 
 export async function deletePerson(id) {
-  const list = read('people')
-  const filtered = list.filter((item) => item.id !== id)
-  write('people', filtered)
-  return Promise.resolve()
+  await http.delete(`/people/${id}`)
 }
